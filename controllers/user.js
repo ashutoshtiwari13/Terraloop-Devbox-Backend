@@ -37,9 +37,10 @@ export const signupUser = async (req, res) => {
         msg: "Producer or recycler already exists with this number or email",
       });
     }
-    const imageFormats = ["jpg", "png", "svg"];
+    const imageFormats = ["jpg", "png", "svg","jpeg"];
 
     const file = req.file;
+    
     const fileExtsn = file?.mimetype?.split("/")[1];
     if (!imageFormats.includes(fileExtsn)) {
       return res
@@ -102,7 +103,7 @@ export const loginUser = async (req, res) => {
       token,
     }
     delete user.password;
-    res.status(200).json({data:user,msg:"Login successfull"})
+    res.status(200).json({user,msg:"Login successfull"})
   } catch (error) {
     res.status(400).json({ msg: error.message });
   }
