@@ -18,6 +18,7 @@ export const createOffer = async (req, res) => {
       validity,
       recyclingMethod,
       unit,
+      category
     } = req.body;
 
     const recycler = await User.findById(req.user);
@@ -53,6 +54,7 @@ export const createOffer = async (req, res) => {
       unit,
       document: doc.secure_url,
       createdBy: recycler._id,
+      category
     });
     recycler.createdOffers.push(newOffer._id);
     res.status(200).json({ msg: "Offer created",newOffer });

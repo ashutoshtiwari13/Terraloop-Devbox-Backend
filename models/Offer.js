@@ -5,6 +5,7 @@ const offerSchema = new mongoose.Schema(
     title: String,
     image:String,
     wasteType: String,
+    category:String,
     creditsAvailable: String,
     creditsForBid: String,
     pricePerCredit: String,
