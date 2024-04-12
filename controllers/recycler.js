@@ -1,12 +1,13 @@
 import Offer from "../models/Offer.js";
 import User from "../models/User.js";
+import Transaction from "../models/Transaction.js";
 import cloudinary from "../utils/cloudinary.js";
 /**
  * create offer from recycler
  */
 
 export const createOffer = async (req, res) => {
-  console.log(req.body.validity);
+  
   try {
     const {
       title,
@@ -97,3 +98,4 @@ export const getOfferDetails = async (req, res) => {
     res.status(200).json({ msg: error.message });
   }
 };
+

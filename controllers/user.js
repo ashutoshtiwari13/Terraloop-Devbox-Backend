@@ -1,5 +1,6 @@
 import User from "../models/User.js";
-import Offer from "../models/Offer.js"
+import Offer from "../models/Offer.js";
+import Transaction from "../models/Transaction.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import cloudinary from "../utils/cloudinary.js";
@@ -119,29 +120,48 @@ export const loginUser = async (req, res) => {
 
 export const fetchProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user).populate(
-      "createdOffers"
-    );
+    const user = await User.findById(req.user).populate("createdOffers");
     if (user.role === "Recycler") {
       delete user.password;
-      return res
-        .status(200)
-        .json({
-          msg: "Recycler profile fetched",
-          user,
-          offers: user.createdOffers,
-        });
+      return res.status(200).json({
+        msg: "Recycler profile fetched",
+        user,
+        offers: user.createdOffers,
+      });
     } else {
       //  for producer fetch all ofers from db
-      const offers = await Offer.find().sort({_id:-1});
+      const offers = await Offer.find().sort({ _id: -1 }).populate("createdBy");
       delete user.password;
-      return res
-        .status(200)
-        .json({
-          msg: "Producer profile fetched",
-          user,
-          offers: offers,
-        });
+      return res.status(200).json({
+        msg: "Producer profile fetched",
+        user,
+        offers: offers,
+      });
+    }
+  } catch (error) {
+    res.status(400).json({ msg: error.message });
+  }
+};
+
+/**
+ * fetch transactions for both recycler and producer
+ */
+
+export const fetchTransactions = async (req, res) => {
+  try {
+    const user = await User.findById(req.user);
+
+    if (user.role == "Recycler") {
+      //  get transactions for recycler
+      const transactions = await Transaction.find({
+        recyclers: { $in: [user._id] },
+      }).sort({ _id: -1 });
+      return res.status(200).json({ transactions });
+    } else {
+      const transactions = await Transaction.find({
+        purchasedBy: user._id,
+      }).sort({ _id: -1 });
+      return res.status(200).json({ transactions });
     }
   } catch (error) {
     res.status(400).json({ msg: error.message });
