@@ -1,3 +1,17 @@
 import mongoose from "mongoose";
 
+const transactionSchema = new mongoose.Schema(
+  {
+    items: [],
+    totalAmount: Number,
+    purchasedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
+export default mongoose.model("Transaction", transactionSchema);

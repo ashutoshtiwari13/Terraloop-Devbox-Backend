@@ -61,12 +61,6 @@ const userSchema = new mongoose.Schema(
         ref: "Offer",
       },
     ],
-    boughtOffers: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Offer",
-      },
-    ],
     createdOffers: [
       {
         type: mongoose.Schema.Types.ObjectId,

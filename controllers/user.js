@@ -1,4 +1,5 @@
 import User from "../models/User.js";
+import Offer from "../models/Offer.js"
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import cloudinary from "../utils/cloudinary.js";
@@ -37,10 +38,10 @@ export const signupUser = async (req, res) => {
         msg: "Producer or recycler already exists with this number or email",
       });
     }
-    const imageFormats = ["jpg", "png", "svg","jpeg"];
+    const imageFormats = ["jpg", "png", "svg", "jpeg"];
 
     const file = req.file;
-    
+
     const fileExtsn = file?.mimetype?.split("/")[1];
     if (!imageFormats.includes(fileExtsn)) {
       return res
@@ -81,29 +82,67 @@ export const signupUser = async (req, res) => {
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    
+
     let user = await User.findOne({
       email: email,
     });
-    if(!user){
-      return res.status(400).json({msg:"User not found with this email"});
+    if (!user) {
+      return res.status(400).json({ msg: "User not found with this email" });
     }
-    
-    const isValidPasswd = await bcrypt.compare(password, user.password  );
-     console.log(isValidPasswd)
-    if(!isValidPasswd){
-      return res.status(400).json({msg:"Incorrect email or password"});
+
+    const isValidPasswd = await bcrypt.compare(password, user.password);
+    console.log(isValidPasswd);
+    if (!isValidPasswd) {
+      return res.status(400).json({ msg: "Incorrect email or password" });
     }
-    const token = jwt.sign({
-      id:user._id,
-      email:user.email,
-    },process.env.JWT_SECRET);
+    const token = jwt.sign(
+      {
+        id: user._id,
+        email: user.email,
+      },
+      process.env.JWT_SECRET
+    );
     user = {
       ...user._doc,
       token,
-    }
+    };
     delete user.password;
-    res.status(200).json({user,msg:"Login successfull"})
+    res.status(200).json({ user, msg: "Login successfull" });
+  } catch (error) {
+    res.status(400).json({ msg: error.message });
+  }
+};
+
+/**
+ * fetch user profile
+ */
+
+export const fetchProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user).populate(
+      "createdOffers"
+    );
+    if (user.role === "Recycler") {
+      delete user.password;
+      return res
+        .status(200)
+        .json({
+          msg: "Recycler profile fetched",
+          user,
+          offers: user.createdOffers,
+        });
+    } else {
+      //  for producer fetch all ofers from db
+      const offers = await Offer.find().sort({_id:-1});
+      delete user.password;
+      return res
+        .status(200)
+        .json({
+          msg: "Producer profile fetched",
+          user,
+          offers: offers,
+        });
+    }
   } catch (error) {
     res.status(400).json({ msg: error.message });
   }

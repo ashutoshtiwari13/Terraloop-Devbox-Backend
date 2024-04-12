@@ -1,7 +1,7 @@
 import express from "express";
 import upload from "../utils/multerLogic.js";
 import auth from "../utils/auth.js";
-import { createOffer } from "../controllers/recycler.js";
+import { createOffer, getOfferDetails } from "../controllers/recycler.js";
 
 const router = express.Router();
 
@@ -20,5 +20,7 @@ router.post(
   ]),
   createOffer
 );
+
+router.get("/offer-details/:id", auth, getOfferDetails);
 
 export default router;
