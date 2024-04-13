@@ -17,7 +17,9 @@ const offerSchema = new mongoose.Schema(
     createdBy:{
       type:mongoose.Schema.Types.ObjectId,
       ref:"User"
-    }
+    },
+    reviews:[],
+    rating:String
   },
   {
     timestamps: true,

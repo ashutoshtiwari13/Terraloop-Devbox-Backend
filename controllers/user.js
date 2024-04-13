@@ -150,7 +150,7 @@ export const fetchProfile = async (req, res) => {
 export const fetchTransactions = async (req, res) => {
   try {
     const user = await User.findById(req.user);
-
+    console.log(user.role)
     if (user.role == "Recycler") {
       //  get transactions for recycler
       const transactions = await Transaction.find({
