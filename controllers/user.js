@@ -144,13 +144,54 @@ export const fetchProfile = async (req, res) => {
 };
 
 /**
+ * fetch user offers
+ * fetch all offers for producer
+ * fetch  specific offers for recycler
+ * apply tab filter
+ */
+
+export const fetchOffers = async (req, res) => {
+  const { tabValue, search, validity, priceRange } = req.query;
+  const user = await User.findById(req.user);
+  let queryObject = {};
+
+  if (tabValue && tabValue !== "") {
+    queryObject.category = tabValue;
+  }
+
+  if (user.role === "Recycler") {
+    queryObject.createdBy = user._id;
+  }
+
+  if (search) {
+    queryObject.title = { $regex: new RegExp(search, "i") };
+  }
+
+  if (validity) {
+    queryObject.validity = validity;
+  }
+
+  if (priceRange) {
+    queryObject.priceRange = priceRange;
+    // Implement price range filter here, modify queryObject accordingly
+  }
+
+  try {
+    const offers = await Offer.find(queryObject).sort({ _id: -1 });
+    return res.status(200).json({ offers });
+  } catch (error) {
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+/**
  * fetch transactions for both recycler and producer
  */
 
 export const fetchTransactions = async (req, res) => {
   try {
     const user = await User.findById(req.user);
-    console.log(user.role)
+    console.log(user.role);
     if (user.role == "Recycler") {
       //  get transactions for recycler
       const transactions = await Transaction.find({
