@@ -7,7 +7,6 @@ import cloudinary from "../utils/cloudinary.js";
  */
 
 export const createOffer = async (req, res) => {
-  
   try {
     const {
       title,
@@ -71,16 +70,92 @@ export const createOffer = async (req, res) => {
 
 export const updateOffer = async (req, res) => {
   try {
-    const updatedOffer = await Offer.findByIdAndUpdate(
-      req.params.id,
-      {
-        $set: req.body,
-      },
-      {
-        new: true,
-      }
-    );
-    res.status(200).json({ msg: "Offer updated", updatedOffer });
+    // update without image and document
+    if (!req.files) {
+      console.log("first if running");
+      const updatedOffer = await Offer.findByIdAndUpdate(
+        req.params.id,
+        {
+          $set: req.body,
+        },
+        {
+          new: true,
+        }
+      );
+      return res.status(200).json({ msg: "Offer updated", updatedOffer });
+    }
+    
+
+    // when user select an image
+
+    if (req.files && req.files.image && req.files.image.length > 0) {
+      const img = await cloudinary.v2.uploader.upload(req.files.image[0].path);
+      const updatedOffer = await Offer.findByIdAndUpdate(
+        req.params.id,
+        {
+          $set: req.body,
+          image: img.secure_url,
+        },
+        {
+          new: true,
+        }
+      );
+      return res.status(200).json({ msg: "Offer updated", updatedOffer });
+    }
+    
+    // if user select only document
+    if (req.files && req.files.document && req.files.document.length > 0) {
+      const doc = await cloudinary.v2.uploader.upload(
+        req.files.document[0].path
+      );
+      const updatedOffer = await Offer.findByIdAndUpdate(
+        req.params.id,
+        {
+          $set: req.body,
+          document: doc.secure_url,
+        },
+        {
+          new: true,
+        }
+      );
+      return res.status(200).json({ msg: "Offer updated", updatedOffer });
+    }
+    // when user selects both image and document
+    if (
+      req.files &&
+      req.files.image &&
+      req.files.image.length > 0 &&
+      req.files.document &&
+      req.files.document.length > 0
+    ) {
+      const doc = await cloudinary.v2.uploader.upload(
+        req.files.document[0].path
+      );
+      const img = await cloudinary.v2.uploader.upload(req.files.image[0].path);
+      const updatedOffer = await Offer.findByIdAndUpdate(
+        req.params.id,
+        {
+          $set: req.body,
+          document: doc.secure_url,
+          image: img.secure_url,
+        },
+        {
+          new: true,
+        }
+      );
+      return res.status(200).json({ msg: "Offer updated", updatedOffer });
+    } else {
+      const updatedOffer = await Offer.findByIdAndUpdate(
+        req.params.id,
+        {
+          $set: req.body,
+        },
+        {
+          new: true,
+        }
+      );
+      return res.status(200).json({ msg: "Offer updated", updatedOffer });
+    }
   } catch (error) {
     res.status(400).json({ msg: error.message });
   }
@@ -95,7 +170,19 @@ export const getOfferDetails = async (req, res) => {
     const offer = await Offer.findById(req.params.id).populate("createdBy");
     res.status(200).json({ offer });
   } catch (error) {
-    res.status(200).json({ msg: error.message });
+    res.status(400).json({ msg: error.message });
   }
 };
 
+/**
+ * delete offer
+ */
+
+export const deleteOffer = async (req, res) => {
+  try {
+    await Offer.findByIdAndDelete(req.params.id);
+    res.status(200).json({ msg: 'Offer Deleted' });
+  } catch (error) {
+    res.status(400).json({ msg: error.message });
+  }
+};
