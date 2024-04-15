@@ -177,7 +177,7 @@ export const fetchOffers = async (req, res) => {
   }
 
   try {
-    const offers = await Offer.find(queryObject).sort({ _id: -1 });
+    const offers = await Offer.find(queryObject).sort({ _id: -1 }).populate("createdBy");
     return res.status(200).json({ offers });
   } catch (error) {
     return res.status(500).json({ error: "Internal server error" });
