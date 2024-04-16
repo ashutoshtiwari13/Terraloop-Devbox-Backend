@@ -73,7 +73,12 @@ const userSchema = new mongoose.Schema(
         ref: "Transaction",
       },
     ],
-    
+    businessType:String,
+    industrySector:String,
+    companySize:String,
+    annualSalesVolume:String,
+    eprObligation:String,
+    wasteType:String,
   },
   {
     timestamps: true,

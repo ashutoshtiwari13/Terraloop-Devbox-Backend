@@ -144,6 +144,45 @@ export const fetchProfile = async (req, res) => {
 };
 
 /**
+ * update profile
+ */
+
+export const updateProfile = async (req, res) => {
+  try {
+    // update profile with logo
+    if (req.file) {
+      const imageFormats = ["jpg", "png", "svg", "jpeg"];
+
+      const file = req.file;
+
+      const fileExtsn = file?.mimetype?.split("/")[1];
+      if (!imageFormats.includes(fileExtsn)) {
+        return res
+          .status(400)
+          .json({ msg: `File with extension ${fileExtsn} is not allowed` });
+      }
+      const imgUrl = await cloudinary.v2.uploader.upload(file.path);
+      const updateUser = await User.findByIdAndUpdate(req.user, {
+        $set: req.body,
+        logo: imgUrl.secure_url,
+      });
+      return res.status(200).json({msg:'Profile updated successfully'});
+    }else{
+      const updateUser = await User.findByIdAndUpdate(req.user, {
+        $set: req.body,
+      },
+      {
+        new:true
+      }
+    );
+    return res.status(200).json({msg:'Profile updated successfully'}); 
+    }
+  } catch (error) {
+    res.status(400).json({ msg: error.message });
+  }
+};
+
+/**
  * fetch user offers
  * fetch all offers for producer
  * fetch  specific offers for recycler
@@ -177,7 +216,9 @@ export const fetchOffers = async (req, res) => {
   }
 
   try {
-    const offers = await Offer.find(queryObject).sort({ _id: -1 }).populate("createdBy");
+    const offers = await Offer.find(queryObject)
+      .sort({ _id: -1 })
+      .populate("createdBy");
     return res.status(200).json({ offers });
   } catch (error) {
     return res.status(500).json({ error: "Internal server error" });
