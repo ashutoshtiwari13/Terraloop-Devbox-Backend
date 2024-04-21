@@ -47,6 +47,10 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
     },
+    isAprooved:{
+  type:Boolean,
+  default:false
+    },
     role: {
       type: String,
       enum: ["Producer", "Recycler"],

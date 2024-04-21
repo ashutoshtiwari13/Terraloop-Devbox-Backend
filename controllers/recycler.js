@@ -19,6 +19,7 @@ export const createOffer = async (req, res) => {
       recyclingMethod,
       unit,
       category,
+      subcategory,
     } = req.body;
 
     const recycler = await User.findById(req.user);
@@ -55,6 +56,7 @@ export const createOffer = async (req, res) => {
       document: doc.secure_url,
       createdBy: recycler._id,
       category,
+      subcategory
     });
     recycler.createdOffers.push(newOffer._id);
     await recycler.save();
