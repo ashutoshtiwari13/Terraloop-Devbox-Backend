@@ -237,7 +237,7 @@ export const fetchTransactions = async (req, res) => {
       //  get transactions for recycler
       const transactions = await Transaction.find({
         recyclers: { $in: [user._id] },
-      }).sort({ _id: -1 });
+      }).sort({ _id: -1 }).populate("purchasedBy");
       return res.status(200).json({ transactions });
     } else {
       const transactions = await Transaction.find({
@@ -249,3 +249,4 @@ export const fetchTransactions = async (req, res) => {
     res.status(400).json({ msg: error.message });
   }
 };
+

@@ -5,7 +5,10 @@ import {
   createOffer,
   getOfferDetails,
   updateOffer,
-  deleteOffer
+  deleteOffer,
+  updateActiveNotifications,
+  fetchActiveNotifications,
+  uploadCertificate,
 } from "../controllers/recycler.js";
 
 const router = express.Router();
@@ -44,6 +47,15 @@ router.post(
   updateOffer
 );
 
-router.get("/delete/offer/:id",auth,deleteOffer);
+router.get("/delete/offer/:id", auth, deleteOffer);
+
+router.get("/fetch/notifications", auth, fetchActiveNotifications);
+router.post("/update/notifications", auth, updateActiveNotifications);
+router.post(
+  "/upload/certificate",
+  auth,
+  upload.single("certificate"),
+  uploadCertificate
+);
 
 export default router;

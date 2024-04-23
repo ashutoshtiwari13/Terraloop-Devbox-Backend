@@ -1,6 +1,6 @@
 import express from "express";
 import auth from "../utils/auth.js";
-import { aprooveOrReject ,fetchAllUsers ,signupAdmin,loginAdmin,deleteUser} from "../controllers/admin.js";
+import { aprooveOrReject ,fetchAllUsers ,signupAdmin,loginAdmin,deleteUser,} from "../controllers/admin.js";
 
 const router = express.Router();
 

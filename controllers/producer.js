@@ -1,6 +1,7 @@
 import Offer from "../models/Offer.js";
 import Transaction from "../models/Transaction.js";
 import User from "../models/User.js";
+import RecyclerNotification from "../models/RecyclerNotification.js";
 
 /**
  * create transaction and credit purchase
@@ -42,8 +43,19 @@ export const createTransaction = async (req, res) => {
     user.transactionHistoty.push(newTransaction._id);
 
     await user.save();
-    res.status(200).json({ newTransaction });
+
+    // create notifications for recyclers-:
+    const notifications = [];
+    for (let index = 0; index < items.length; index++) {
+      const notify = await RecyclerNotification.create({
+        message: `Your credits have been purchased by producer ${user.userName}`,
+        receiver: items[index].createdBy?._id,
+      });
+      notifications.push(notify);
+    }
+    res.status(200).json({ newTransaction, notifications });
   } catch (error) {
     res.status(400).json({ msg: error.message });
   }
 };
+

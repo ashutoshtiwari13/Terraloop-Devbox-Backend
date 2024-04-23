@@ -2,6 +2,7 @@ import Offer from "../models/Offer.js";
 import User from "../models/User.js";
 import Transaction from "../models/Transaction.js";
 import cloudinary from "../utils/cloudinary.js";
+import RecyclerNotification from "../models/RecyclerNotification.js";
 /**
  * create offer from recycler
  */
@@ -188,3 +189,62 @@ export const deleteOffer = async (req, res) => {
     res.status(400).json({ msg: error.message });
   }
 };
+
+/**
+ * fetch active notification for recyclers
+ */
+
+export const fetchActiveNotifications = async(req,res)=>{
+  try {
+    const notifications   =   await RecyclerNotification.find({
+      receiver:req.user,
+      isNewValue:true
+    });
+    res.status(200).json({notifications});
+  } catch (error) {
+    res.status(400).json({ msg: error.message });
+  }
+}
+
+/**
+ *  update active notification for recyclers
+ */
+
+export const updateActiveNotifications = async(req,res)=>{
+  try {
+     await RecyclerNotification.updateMany({
+      receiver:req.user,
+      isNewValue:false
+     });
+     res.status(200).json({notifications});
+  } catch (error) {
+    res.status(400).json({ msg: error.message });
+  }
+}
+
+
+/**
+ * upload certificate for transaction
+ */
+
+export const uploadCertificate =  async(req,res)=>{
+  try {
+    const {itemId, transactionId} = req.body;
+    if(!itemId) return res.status(400).json({msg:"Item id is required"});
+    if(!transactionId) return res.status(400).json({msg:"Transaction id is required"});
+   
+     const file  = req.file;
+     const url =  await cloudinary.v2.uploader.upload(file.path);
+     const newTransaction =  await Transaction.updateOne({
+      _id:transactionId,
+      "items._id":itemId
+     },{
+      $set:{
+        "items.$.certificate": url.secure_url
+      }
+     })
+     res.status(200).json({msg:"Certificate saved successfully"})
+  } catch (error) {
+    res.status(400).json({ msg: error.message });
+  }
+}
