@@ -89,6 +89,7 @@ export const aprooveOrReject = async (req, res) => {
           new: true,
         }
       );
+      return res.status(200).json({msg:"User profile aprooved"})
     } else {
       await User.findByIdAndUpdate(
         userId,
@@ -100,6 +101,7 @@ export const aprooveOrReject = async (req, res) => {
           new: true,
         }
       );
+      return res.status(200).json({msg:"User profile not aprooved"})
     }
   } catch (error) {
     res.status(400).json({ msg: error.message });
