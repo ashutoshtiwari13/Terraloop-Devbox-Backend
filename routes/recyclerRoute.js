@@ -50,7 +50,7 @@ router.post(
 router.get("/delete/offer/:id", auth, deleteOffer);
 
 router.get("/fetch/notifications", auth, fetchActiveNotifications);
-router.post("/update/notifications", auth, updateActiveNotifications);
+router.get("/update/notifications", auth, updateActiveNotifications);
 router.post(
   "/upload/certificate",
   auth,
