@@ -4,6 +4,7 @@ import Transaction from "../models/Transaction.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import cloudinary from "../utils/cloudinary.js";
+import sendMail from "../utils/sendMail.js";
 /**
  * signup recycler or producer
  * this is a common signup for both recycler and producer
@@ -70,11 +71,46 @@ export const signupUser = async (req, res) => {
       logo: imgUrl.secure_url,
       registerationDate,
     });
-    res.status(201).json({ user });
+    const otp = Math.floor(1000 + Math.random() * 900000);
+    user.otp =  otp;
+    await user.save();
+    await sendMail(otp,email,"Email verification OTP");
+    res.status(201).json({ user ,otp});
   } catch (error) {
     res.status(400).json({ msg: error.message });
   }
 };
+
+/**
+ * verify email after signup
+ */
+
+export const verifyEmailSignup  = async(req,res)=>{
+  try {
+    const {email,otp}  = req.body;
+    console.log(email,otp);
+    const user   =  await User.findOne({
+      email:email
+    });
+    if(!user){
+      return res.status(400).json({msg:"User not found with this email"});
+    }
+    if(String(user.otp)==otp){
+      // update user email is verified
+      await User.updateOne({email:email},{
+        $set:{
+          isEmailVerified:true,
+          otp:'000000'
+        }
+      })
+      return res.status(200).json({msg:"Email Verified",success:true});
+    }else{
+      return res.status(400).json({msg:"Please provide correct OTP",success:false});
+    }
+  } catch (error) {
+    res.status(400).json({ msg: error.message });
+  }
+}
 
 /**
  * login api for producer and recycler

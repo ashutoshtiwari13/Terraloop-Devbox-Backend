@@ -83,6 +83,7 @@ const userSchema = new mongoose.Schema(
     annualSalesVolume:String,
     eprObligation:String,
     wasteType:String,
+    otp:Number,
   },
   {
     timestamps: true,
