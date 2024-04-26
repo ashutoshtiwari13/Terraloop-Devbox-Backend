@@ -2,6 +2,8 @@ import User from "../models/User.js";
 import Admin from "../models/Admin.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import Offer from "../models/Offer.js";
+
 
 /**
  * signup admin
@@ -140,6 +142,32 @@ export const deleteUser  = async(req,res)=>{
   try {
     await User.findByIdAndDelete(req.params.id);
     return res.status(200).json({msg:"User deleted"});
+  } catch (error) {
+    res.status(400).json({ msg: error.message });
+  }
+}
+
+/**
+ * fetch all offers for admin
+ */
+
+export const fetchAllOffers  =  async(req,res)=>{
+  try {
+    const offers  = await Offer.find().sort({_id:-1});
+    res.status(200).json({offers});
+  } catch (error) {
+    res.status(400).json({ msg: error.message });
+  }
+}
+
+/**
+ * delete a offer
+ */
+
+export const deleteOffer = async(req,res)=>{
+  try {
+     await Offer.findByIdAndDelete(req.params.id);
+     res.status(200).json({msg:"Offer deleted"});
   } catch (error) {
     res.status(400).json({ msg: error.message });
   }
