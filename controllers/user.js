@@ -5,6 +5,8 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import cloudinary from "../utils/cloudinary.js";
 import sendMail from "../utils/sendMail.js";
+import Rating from "../models/Rating.js";
+
 /**
  * signup recycler or producer
  * this is a common signup for both recycler and producer
@@ -285,4 +287,8 @@ export const fetchTransactions = async (req, res) => {
     res.status(400).json({ msg: error.message });
   }
 };
+
+/**
+ * 
+ */
 

@@ -84,6 +84,7 @@ const userSchema = new mongoose.Schema(
     eprObligation:String,
     wasteType:String,
     otp:Number,
+   
   },
   {
     timestamps: true,
