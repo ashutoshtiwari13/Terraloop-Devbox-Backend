@@ -289,6 +289,34 @@ export const fetchTransactions = async (req, res) => {
 };
 
 /**
- * 
+ *  fetch offers without token
  */
 
+
+export const fetchOfferWithoutToken  = async(req,res)=>{
+  const { tabValue, search, validity, priceRange } = req.query;
+  let queryObject = {};
+  if (tabValue && tabValue !== "") {
+    queryObject.category = tabValue;
+  }
+  if (search) {
+    queryObject.title = { $regex: new RegExp(search, "i") };
+  }
+
+  if (validity) {
+    queryObject.validity = validity;
+  }
+
+  if (priceRange) {
+    queryObject.priceRange = priceRange;
+    // Implement price range filter here, modify queryObject accordingly
+  }
+    try{
+      const offers = await Offer.find(queryObject)
+      .sort({ _id: -1 })
+      .populate("createdBy");
+      return res.status(200).json({ offers });
+    } catch(error){
+      res.status(400).json({ msg: error.message });
+    }
+}
