@@ -45,39 +45,68 @@ export const signupUser = async (req, res) => {
     const imageFormats = ["jpg", "png", "svg", "jpeg"];
 
     const file = req.file;
-
-    const fileExtsn = file?.mimetype?.split("/")[1];
-    if (!imageFormats.includes(fileExtsn)) {
-      return res
-        .status(400)
-        .json({ msg: `File with extension ${fileExtsn} is not allowed` });
+    // singup with logo
+    if(file){
+      const fileExtsn = file?.mimetype?.split("/")[1];
+      if (!imageFormats.includes(fileExtsn)) {
+        return res
+          .status(400)
+          .json({ msg: `File with extension ${fileExtsn} is not allowed` });
+      }
+      const imgUrl = await cloudinary.v2.uploader.upload(file.path);
+      const hashedPassword = await bcrypt.hash(password, 10);
+      user = await User.create({
+        userName,
+        email,
+        phone,
+        designation,
+        companyName,
+        companyLocation,
+        address,
+        gstNum,
+        logo,
+        registrationState,
+        registrationNum,
+        isRegisteredWithCPCb,
+        validity,
+        password: hashedPassword,
+        role,
+        logo: imgUrl.secure_url,
+        registerationDate,
+      });
+      const otp = Math.floor(1000 + Math.random() * 900000);
+      user.otp =  otp;
+      await user.save();
+      await sendMail(otp,email,"Email verification OTP");
+     return  res.status(201).json({ user ,otp});
+    }else{
+    //   signup without logo
+      const hashedPassword = await bcrypt.hash(password, 10);
+      user = await User.create({
+        userName,
+        email,
+        phone,
+        designation,
+        companyName,
+        companyLocation,
+        address,
+        gstNum,
+        logo,
+        registrationState,
+        registrationNum,
+        isRegisteredWithCPCb,
+        validity,
+        password: hashedPassword,
+        role,
+        registerationDate,
+      });
+      const otp = Math.floor(1000 + Math.random() * 900000);
+      user.otp =  otp;
+      await user.save();
+      await sendMail(otp,email,"Email verification OTP");
+     return  res.status(201).json({ user ,otp});
     }
-    const imgUrl = await cloudinary.v2.uploader.upload(file.path);
-    const hashedPassword = await bcrypt.hash(password, 10);
-    user = await User.create({
-      userName,
-      email,
-      phone,
-      designation,
-      companyName,
-      companyLocation,
-      address,
-      gstNum,
-      logo,
-      registrationState,
-      registrationNum,
-      isRegisteredWithCPCb,
-      validity,
-      password: hashedPassword,
-      role,
-      logo: imgUrl.secure_url,
-      registerationDate,
-    });
-    const otp = Math.floor(1000 + Math.random() * 900000);
-    user.otp =  otp;
-    await user.save();
-    await sendMail(otp,email,"Email verification OTP");
-    res.status(201).json({ user ,otp});
+
   } catch (error) {
     res.status(400).json({ msg: error.message });
   }
