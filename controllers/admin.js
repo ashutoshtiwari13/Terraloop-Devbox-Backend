@@ -3,7 +3,7 @@ import Admin from "../models/Admin.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import Offer from "../models/Offer.js";
-
+import Transaction from "../models/Transaction.js"
 
 /**
  * signup admin
@@ -168,6 +168,20 @@ export const deleteOffer = async(req,res)=>{
   try {
      await Offer.findByIdAndDelete(req.params.id);
      res.status(200).json({msg:"Offer deleted"});
+  } catch (error) {
+    res.status(400).json({ msg: error.message });
+  }
+}
+
+
+/**
+ * get transactions for admin
+ */
+
+export const fetchAdminTransactions  = async(req,res)=>{
+  try {
+    const transactions  = await Transaction.find().populate("purchasedBy").sort({_id:-1});
+     res.status(200).json({transactions});
   } catch (error) {
     res.status(400).json({ msg: error.message });
   }
