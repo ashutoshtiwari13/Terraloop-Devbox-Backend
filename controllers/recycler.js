@@ -229,27 +229,44 @@ export const updateActiveNotifications = async(req,res)=>{
 
 export const uploadCertificate =  async(req,res)=>{
   try {
-    const {purchasedBy, transactionId,itemId} = req.body;
+    const {purchasedBy, transactionId,itemId,action} = req.body;
     if(!itemId) return res.status(400).json({msg:" item id is required"});
     if(!purchasedBy) return res.status(400).json({msg:" purchased by is required"});
     if(!transactionId) return res.status(400).json({msg:"Transaction id is required"});
    
      const file  = req.file;
      const url =  await cloudinary.v2.uploader.upload(file.path);
-     
-       await Transaction.updateOne({
-      _id:transactionId,
-      purchasedBy:purchasedBy,
-      "items._id":itemId
-     },
-     {
-      $set:{
-        "items.$.certificate": url.secure_url
+      if(action=='Certificate'){
+        await Transaction.updateOne({
+          _id:transactionId,
+          purchasedBy:purchasedBy,
+          "items._id":itemId
+         },
+         {
+          $set:{
+            "items.$.certificate": url.secure_url
+          }
+         },
+        );
+      return   res.status(200).json({msg:"Certificate saved successfully"})
+      }else{
+        //  upload and save document from recycler for specific transaction 
+        await Transaction.updateOne({
+          _id:transactionId,
+          purchasedBy:purchasedBy,
+          "items._id":itemId
+         },
+         {
+          $set:{
+            "items.$.documentUpload": url.secure_url
+          }
+         },
+        );
+        return   res.status(200).json({msg:"Document saved successfully"})
       }
-     },
-    );
+      
    
-     res.status(200).json({msg:"Certificate saved successfully"})
+    
   } catch (error) {
     console.log(error);
     res.status(400).json({ msg: error.message });

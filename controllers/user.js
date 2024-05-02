@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken";
 import cloudinary from "../utils/cloudinary.js";
 import sendMail from "../utils/sendMail.js";
 import Rating from "../models/Rating.js";
+import Request from "../models/Request.js";
 
 /**
  * signup recycler or producer
@@ -77,7 +78,7 @@ export const signupUser = async (req, res) => {
       const otp = Math.floor(1000 + Math.random() * 900000);
       user.otp =  otp;
       await user.save();
-      await sendMail(otp,email,"Email verification OTP");
+      await sendMail(`Your Otp for Terraloop  is ${otp}`,email,"Email verification OTP");
      return  res.status(201).json({ user ,otp});
     }else{
     //   signup without logo
@@ -348,4 +349,25 @@ export const fetchOfferWithoutToken  = async(req,res)=>{
     } catch(error){
       res.status(400).json({ msg: error.message });
     }
+}
+
+/**
+ * create request from user side
+ * waitlist , subscribe etc.
+ */
+
+export const createRequest  = async(req,res)=>{
+  try {
+     const {email,requestType,message}  = req.body;
+     const newRequest  = await Request.create({
+      email,
+      requestType,
+      message
+     });
+    //   send email to user for confirmation
+    await sendMail("Your waitlist request has been received , Thank you for choosing Terraloop",email,"Terraloop Waitlist");
+     res.status(200).json({msg:"Your request has been created"});
+  } catch (error) {
+    res.status(400).json({ msg: error.message });
+  }
 }

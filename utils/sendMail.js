@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 
- async function sendMail(otp,email, subject ,...args){
+ async function sendMail(message,email, subject ,...args){
    try {
     const transport   = nodemailer.createTransport({
         host: process.env.BREVO_HOST,
@@ -14,7 +14,7 @@ import nodemailer from 'nodemailer';
         to:email,
         from:process.env.BREVO_USER_EMAIL,
         subject:subject,
-        html:` Your Otp is ${otp}`
+        html:message
     })
    } catch (error) {
     console.log(error);
