@@ -75,10 +75,11 @@ export const signupUser = async (req, res) => {
         logo: imgUrl.secure_url,
         registerationDate,
       });
-      const otp = Math.floor(1000 + Math.random() * 900000);
+      const otp = Math.floor(100000 + Math.random() * 900000);
       user.otp =  otp;
       await user.save();
-      await sendMail(`Your Otp for Terraloop  is ${otp}`,email,"Email verification OTP");
+      const otpMessage  =  `<h1>Your Otp for Terraloop  is ${String(otp)}</h1>`
+      await sendMail(otpMessage,email,"Email verification OTP");
      return  res.status(201).json({ user ,otp});
     }else{
     //   signup without logo
@@ -101,10 +102,11 @@ export const signupUser = async (req, res) => {
         role,
         registerationDate,
       });
-      const otp = Math.floor(1000 + Math.random() * 900000);
+      const otp = Math.floor(100000 + Math.random() * 900000);
       user.otp =  otp;
       await user.save();
-      await sendMail(otp,email,"Email verification OTP");
+      const otpMessage  =  `<h1>Your Otp for Terraloop  is ${String(otp)}</h1>`
+      await sendMail(otpMessage,email,"Email verification OTP");
      return  res.status(201).json({ user ,otp});
     }
 
