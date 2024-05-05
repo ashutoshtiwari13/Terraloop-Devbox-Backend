@@ -252,6 +252,88 @@ export const updateProfile = async (req, res) => {
   }
 };
 
+
+/**
+ * send forget password otp
+ * 
+ */
+
+export const sendForgotPasswordOtop  = async(req,res)=>{
+  try {
+    const {email} =  req.body;
+    let user =  await User.findOne({email: email});
+    if(!user){
+      return res.status(400).json({msg:"User not found with this email"});
+    }
+    const otp = Math.floor(100000 + Math.random() * 900000);
+      user.otp =  otp;
+      await user.save();
+      const otpMessage  =  `<h1>Your Otp for reset password  is ${String(otp)}</h1>`
+      await sendMail(otpMessage,email,"Reset password verification OTP");
+      res.status(200).json({msg:"OTP sent"})
+  } catch (error) {
+    res.status(400).json({ msg: error.message });
+  }
+}
+
+/**
+ * 
+ * verify forgot password otp
+ */
+
+export const verifyForgotPassOtp  = async(req,res)=>{
+  try {
+    const {otp,email}   =  req.body;
+    
+    console.log(email,otp);
+    const user   =  await User.findOne({
+      email:email
+    });
+    if(!user){
+      return res.status(400).json({msg:"User not found with this email"});
+    }
+    if(String(user.otp)==otp){
+      // update user email is verified
+      await User.updateOne({email:email},{
+        $set:{
+          otp:'000000'
+        }
+      })
+      return res.status(200).json({msg:"OTP matched",success:true});
+    }else{
+      return res.status(400).json({msg:"Please provide correct OTP",success:false});
+    }
+  } catch (error) {
+    res.status(400).json({ msg: error.message });
+  }
+}
+
+/**
+ * 
+ * change password
+ */
+
+export const changePassword  = async(req,res)=>{
+  try {
+    const {email,password} =  req.body;
+    const user   =  await User.findOne({
+      email:email
+    });
+    if(!user){
+      return res.status(400).json({msg:"User not found with this email"});
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const updatedUser   =  await User.updateOne({email:email},{
+      $set:{
+        password:hashedPassword
+      }
+    });
+    res.status(200).json({msg:"Password updated"});
+  } catch (error) {
+    res.status(400).json({ msg: error.message });
+  }
+}
+
 /**
  * fetch user offers
  * fetch all offers for producer
@@ -373,3 +455,5 @@ export const createRequest  = async(req,res)=>{
     res.status(400).json({ msg: error.message });
   }
 }
+
+

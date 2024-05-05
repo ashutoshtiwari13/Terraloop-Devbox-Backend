@@ -9,7 +9,10 @@ import {
   updateProfile,
   verifyEmailSignup,
   fetchOfferWithoutToken,
-  createRequest
+  createRequest,
+  sendForgotPasswordOtop,
+  verifyForgotPassOtp,
+  changePassword
 } from "../controllers/user.js";
 import auth from "../utils/auth.js";
 
@@ -24,4 +27,7 @@ router.get("/offers", auth, fetchOffers);
 router.get("/fetch/transactions", auth, fetchTransactions);
 router.get("/landing-page/offers", fetchOfferWithoutToken);
 router.post("/create/request",createRequest);
+router.post("/send/forgot/otp",sendForgotPasswordOtop);
+router.post("/forgot/otp/verify",verifyForgotPassOtp);
+router.post("/change-password",changePassword);
 export default router;
