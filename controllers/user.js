@@ -343,6 +343,7 @@ export const changePassword  = async(req,res)=>{
 
 export const fetchOffers = async (req, res) => {
   const { tabValue, search, validity, priceRange } = req.query;
+  console.log(priceRange)
   const user = await User.findById(req.user);
   let queryObject = {};
 
@@ -363,7 +364,7 @@ export const fetchOffers = async (req, res) => {
   }
 
   if (priceRange) {
-    queryObject.priceRange = priceRange;
+    queryObject.pricePerCredit = { $lt: parseFloat( priceRange) };
     // Implement price range filter here, modify queryObject accordingly
   }
 
@@ -408,7 +409,9 @@ export const fetchTransactions = async (req, res) => {
 
 
 export const fetchOfferWithoutToken  = async(req,res)=>{
-  const { tabValue, search, validity, priceRange } = req.query;
+  const { tabValue, search, validity, priceRange,sort } = req.query;
+
+  
   let queryObject = {};
   if (tabValue && tabValue !== "") {
     queryObject.category = tabValue;
@@ -420,15 +423,31 @@ export const fetchOfferWithoutToken  = async(req,res)=>{
   if (validity) {
     queryObject.validity = validity;
   }
-
+ 
   if (priceRange) {
-    queryObject.priceRange = priceRange;
+    queryObject.pricePerCredit = { $lt: parseFloat( priceRange) };
     // Implement price range filter here, modify queryObject accordingly
   }
     try{
-      const offers = await Offer.find(queryObject)
-      .sort({ _id: -1 })
-      .populate("createdBy");
+      let query = await Offer.find(queryObject).populate("createdBy");
+
+     console.log(sort);
+      
+    if (sort === "LTH") {
+      query =  query.sort((a,b)=>Number(a.pricePerCredit)-Number(b.pricePerCredit));
+      
+    } else if (sort === "HTL") {
+      query =  query.sort((a,b)=>Number(b.pricePerCredit)- Number(a.pricePerCredit));
+    } else {
+      // Default sorting by _id descending
+      query = query.sort((a, b) => {
+          return new Date(b._id.getTimestamp()) - new Date(a._id.getTimestamp());
+        });
+        
+    }
+
+  
+    const offers =  query;
       return res.status(200).json({ offers });
     } catch(error){
       res.status(400).json({ msg: error.message });
