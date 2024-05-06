@@ -7,6 +7,7 @@ import cloudinary from "../utils/cloudinary.js";
 import sendMail from "../utils/sendMail.js";
 import Rating from "../models/Rating.js";
 import Request from "../models/Request.js";
+import Contact from '../models/Contact.js';
 
 /**
  * signup recycler or producer
@@ -476,3 +477,19 @@ export const createRequest  = async(req,res)=>{
 }
 
 
+/**
+ * sen d contact us requst
+ */
+
+export const sendContactusRequest  = async(req,res)=>{
+  try {
+    const {email,location,fullName,comment} =  req.body;
+    const rqst  = await Contact.create({
+      email,location,fullName,comment
+    });
+    await sendMail("Thank you for choosing terraloop , our team will connect with you shortly",email,"Contact us request");
+    res.status(200).json({msg:"Request sent"})
+  } catch (error) {
+    res.status(400).json({ msg: error.message });
+  }
+}

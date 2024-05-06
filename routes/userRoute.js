@@ -12,7 +12,9 @@ import {
   createRequest,
   sendForgotPasswordOtop,
   verifyForgotPassOtp,
-  changePassword
+  changePassword,
+    sendContactusRequest,
+
 } from "../controllers/user.js";
 import auth from "../utils/auth.js";
 
@@ -30,4 +32,5 @@ router.post("/create/request",createRequest);
 router.post("/send/forgot/otp",sendForgotPasswordOtop);
 router.post("/forgot/otp/verify",verifyForgotPassOtp);
 router.post("/change-password",changePassword);
+router.post("/contact-us",sendContactusRequest);
 export default router;

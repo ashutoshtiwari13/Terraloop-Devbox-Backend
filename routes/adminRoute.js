@@ -9,6 +9,7 @@ import {
   fetchAllOffers,
   deleteOffer,
   fetchAdminTransactions,
+  fetchContactUsData
 } from "../controllers/admin.js";
 
 const router = express.Router();
@@ -21,5 +22,5 @@ router.get("/delete/user/:id", auth, deleteUser);
 router.get("/fetch/offers", auth, fetchAllOffers);
 router.get("/delete/offer/:id", auth, deleteOffer);
 router.get("/fetch/transactions", auth, fetchAdminTransactions);
-
+router.get("/fetch/contact-us",auth,fetchContactUsData);
 export default router;

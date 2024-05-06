@@ -3,7 +3,8 @@ import Admin from "../models/Admin.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import Offer from "../models/Offer.js";
-import Transaction from "../models/Transaction.js"
+import Transaction from "../models/Transaction.js";
+import Contact from "../models/Contact.js";
 
 /**
  * signup admin
@@ -185,4 +186,17 @@ export const fetchAdminTransactions  = async(req,res)=>{
   } catch (error) {
     res.status(400).json({ msg: error.message });
   }
+}
+
+/**
+ * fetch contact us data for dashboard
+ */
+
+export const fetchContactUsData  = async(req,res)=>{
+   try {
+    const contacts   =  await Contact.find().sort({_id:-1});
+    res.status(200).json({contacts});
+   } catch (error) {
+    res.status(400).json({ msg: error.message });
+   }
 }
